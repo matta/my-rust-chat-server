@@ -42,7 +42,6 @@ impl MessageInputBox {
         Self {
             action_tx: action_tx.clone(),
             props: Props::from(state),
-            //
             input_box: InputBox::new(),
         }
     }

@@ -20,7 +20,6 @@ pub struct InputBox {
 impl InputBox {
     pub(crate) fn new() -> Self {
         Self {
-            //
             text: String::new(),
             cursor_position: 0,
         }
