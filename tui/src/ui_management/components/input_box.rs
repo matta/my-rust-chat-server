@@ -88,11 +88,8 @@ impl InputBox {
 }
 
 impl Component for InputBox {
-    fn move_with_state(self, _state: &State) -> Self
-    where
-        Self: Sized,
-    {
-        self
+    fn update_from_state(&mut self, _state: &State) {
+        // Nothing to do here.
     }
 
     fn name(&self) -> &str {

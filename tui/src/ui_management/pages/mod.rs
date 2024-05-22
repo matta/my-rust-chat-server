@@ -66,15 +66,10 @@ impl AppRouter {
 }
 
 impl Component for AppRouter {
-    fn move_with_state(self, state: &State) -> Self
-    where
-        Self: Sized,
-    {
-        AppRouter {
-            props: Props::from(state),
-            chat_page: self.chat_page.move_with_state(state),
-            connect_page: self.connect_page.move_with_state(state),
-        }
+    fn update_from_state(&mut self, state: &State) {
+        self.props = Props::from(state);
+        self.chat_page.update_from_state(state);
+        self.connect_page.update_from_state(state);
     }
 
     // route all functions to the active page

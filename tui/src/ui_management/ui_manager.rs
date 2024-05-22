@@ -67,7 +67,7 @@ impl UiManager {
                 },
                 // Handle state updates
                 Some(state) = state_rx.recv() => {
-                    app_router = app_router.move_with_state(&state);
+                    app_router.update_from_state(&state);
                 },
                 // Catch and handle interrupt signal to gracefully shutdown
                 Ok(interrupted) = interrupt_rx.recv() => {

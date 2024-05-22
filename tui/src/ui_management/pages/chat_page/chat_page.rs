@@ -90,10 +90,7 @@ pub struct ChatPage {
 }
 
 impl ChatPage {
-    pub(crate) fn new(state: &State, action_tx: UnboundedSender<Action>) -> Self
-    where
-        Self: Sized,
-    {
+    pub(crate) fn new(state: &State, action_tx: UnboundedSender<Action>) -> Self {
         ChatPage {
             action_tx: action_tx.clone(),
             // set the props
@@ -105,7 +102,6 @@ impl ChatPage {
             room_list: RoomList::new(state, action_tx.clone()),
             message_input_box: MessageInputBox::new(state, action_tx),
         }
-        .move_with_state(state)
     }
 
     fn get_room_data(&self, name: &str) -> Option<&RoomData> {
@@ -169,19 +165,10 @@ impl ChatPage {
 }
 
 impl Component for ChatPage {
-    fn move_with_state(self, state: &State) -> Self
-    where
-        Self: Sized,
-    {
-        ChatPage {
-            props: Props::from(state),
-            // propagate the update to the child components
-            room_list: self.room_list.move_with_state(state),
-            message_input_box: self.message_input_box.move_with_state(state),
-            action_tx: self.action_tx,
-            active_section: self.active_section,
-            last_hovered_section: self.last_hovered_section,
-        }
+    fn update_from_state(&mut self, state: &State) {
+        self.props = Props::from(state);
+        self.room_list.update_from_state(state);
+        self.message_input_box.update_from_state(state);
     }
 
     fn name(&self) -> &str {

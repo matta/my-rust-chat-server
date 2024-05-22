@@ -67,7 +67,6 @@ impl RoomList {
         Self {
             action_tx,
             props: Props::from(state),
-            //
             list_state: ListState::default(),
         }
     }
@@ -121,15 +120,8 @@ impl RoomList {
 }
 
 impl Component for RoomList {
-    fn move_with_state(self, state: &State) -> Self
-    where
-        Self: Sized,
-    {
-        Self {
-            props: Props::from(state),
-            action_tx: self.action_tx,
-            list_state: self.list_state,
-        }
+    fn update_from_state(&mut self, state: &State) {
+        self.props = Props::from(state);
     }
 
     fn name(&self) -> &str {

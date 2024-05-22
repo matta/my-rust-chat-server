@@ -65,15 +65,8 @@ impl ConnectPage {
 const DEFAULT_SERVER_ADDR: &str = "localhost:8080";
 
 impl Component for ConnectPage {
-    fn move_with_state(self, state: &State) -> Self
-    where
-        Self: Sized,
-    {
-        ConnectPage {
-            props: Props::from(state),
-            action_tx: self.action_tx,
-            input_box: self.input_box,
-        }
+    fn update_from_state(&mut self, state: &State) {
+        self.props = Props::from(state);
     }
 
     fn name(&self) -> &str {

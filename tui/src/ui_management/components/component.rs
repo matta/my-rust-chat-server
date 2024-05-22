@@ -4,9 +4,7 @@ use ratatui::{prelude::Backend, Frame};
 use crate::state_store::State;
 
 pub trait Component {
-    fn move_with_state(self, state: &State) -> Self
-    where
-        Self: Sized;
+    fn update_from_state(&mut self, state: &State);
 
     // Returns a name used to describe the component in the UI.
     fn name(&self) -> &str;

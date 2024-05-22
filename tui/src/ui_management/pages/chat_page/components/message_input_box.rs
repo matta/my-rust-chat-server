@@ -62,15 +62,8 @@ impl MessageInputBox {
 }
 
 impl Component for MessageInputBox {
-    fn move_with_state(self, state: &State) -> Self
-    where
-        Self: Sized,
-    {
-        Self {
-            props: Props::from(state),
-            action_tx: self.action_tx,
-            input_box: self.input_box,
-        }
+    fn update_from_state(&mut self, state: &State) {
+        self.props = Props::from(state);
     }
 
     fn name(&self) -> &str {
