@@ -46,12 +46,9 @@ impl ConnectPage {
 
         ConnectPage {
             action_tx: action_tx.clone(),
-            //
             props: Props::from(state),
-            //
             input_box,
         }
-        .move_with_state(state)
     }
 
     fn connect_to_server(&mut self) {
@@ -74,7 +71,8 @@ impl Component for ConnectPage {
     {
         ConnectPage {
             props: Props::from(state),
-            ..self
+            action_tx: self.action_tx,
+            input_box: self.input_box,
         }
     }
 

@@ -92,7 +92,7 @@ impl Component for InputBox {
     where
         Self: Sized,
     {
-        Self { ..self }
+        self
     }
 
     fn name(&self) -> &str {

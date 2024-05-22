@@ -178,7 +178,9 @@ impl Component for ChatPage {
             // propagate the update to the child components
             room_list: self.room_list.move_with_state(state),
             message_input_box: self.message_input_box.move_with_state(state),
-            ..self
+            action_tx: self.action_tx,
+            active_section: self.active_section,
+            last_hovered_section: self.last_hovered_section,
         }
     }
 

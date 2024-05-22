@@ -45,11 +45,9 @@ impl AppRouter {
     {
         AppRouter {
             props: Props::from(state),
-            //
             chat_page: ChatPage::new(state, action_tx.clone()),
             connect_page: ConnectPage::new(state, action_tx.clone()),
         }
-        .move_with_state(state)
     }
 
     fn get_active_page_component(&self) -> &dyn Component {
@@ -74,7 +72,6 @@ impl Component for AppRouter {
     {
         AppRouter {
             props: Props::from(state),
-            //
             chat_page: self.chat_page.move_with_state(state),
             connect_page: self.connect_page.move_with_state(state),
         }

@@ -68,7 +68,8 @@ impl Component for MessageInputBox {
     {
         Self {
             props: Props::from(state),
-            ..self
+            action_tx: self.action_tx,
+            input_box: self.input_box,
         }
     }
 

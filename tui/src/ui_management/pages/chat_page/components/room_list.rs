@@ -127,7 +127,8 @@ impl Component for RoomList {
     {
         Self {
             props: Props::from(state),
-            ..self
+            action_tx: self.action_tx,
+            list_state: self.list_state,
         }
     }
 
