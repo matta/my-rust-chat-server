@@ -37,6 +37,23 @@ pub struct ConnectPage {
 }
 
 impl ConnectPage {
+    pub(crate) fn new(state: &State, action_tx: UnboundedSender<Action>) -> Self
+    where
+        Self: Sized,
+    {
+        let mut input_box = InputBox::new();
+        input_box.set_text(DEFAULT_SERVER_ADDR);
+
+        ConnectPage {
+            action_tx: action_tx.clone(),
+            //
+            props: Props::from(state),
+            //
+            input_box,
+        }
+        .move_with_state(state)
+    }
+
     fn connect_to_server(&mut self) {
         if self.input_box.is_empty() {
             return;
@@ -51,23 +68,6 @@ impl ConnectPage {
 const DEFAULT_SERVER_ADDR: &str = "localhost:8080";
 
 impl Component for ConnectPage {
-    fn new(state: &State, action_tx: UnboundedSender<Action>) -> Self
-    where
-        Self: Sized,
-    {
-        let mut input_box = InputBox::new(state, action_tx.clone());
-        input_box.set_text(DEFAULT_SERVER_ADDR);
-
-        ConnectPage {
-            action_tx: action_tx.clone(),
-            //
-            props: Props::from(state),
-            //
-            input_box,
-        }
-        .move_with_state(state)
-    }
-
     fn move_with_state(self, state: &State) -> Self
     where
         Self: Sized,

@@ -38,6 +38,15 @@ pub struct MessageInputBox {
 }
 
 impl MessageInputBox {
+    pub(crate) fn new(state: &State, action_tx: UnboundedSender<Action>) -> Self {
+        Self {
+            action_tx: action_tx.clone(),
+            props: Props::from(state),
+            //
+            input_box: InputBox::new(),
+        }
+    }
+
     fn submit_message(&mut self) {
         if self.input_box.is_empty() {
             return;
@@ -53,15 +62,6 @@ impl MessageInputBox {
 }
 
 impl Component for MessageInputBox {
-    fn new(state: &State, action_tx: UnboundedSender<Action>) -> Self {
-        Self {
-            action_tx: action_tx.clone(),
-            props: Props::from(state),
-            //
-            input_box: InputBox::new(state, action_tx),
-        }
-    }
-
     fn move_with_state(self, state: &State) -> Self
     where
         Self: Sized,

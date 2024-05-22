@@ -90,6 +90,24 @@ pub struct ChatPage {
 }
 
 impl ChatPage {
+    pub(crate) fn new(state: &State, action_tx: UnboundedSender<Action>) -> Self
+    where
+        Self: Sized,
+    {
+        ChatPage {
+            action_tx: action_tx.clone(),
+            // set the props
+            props: Props::from(state),
+            // internal component state
+            active_section: Option::None,
+            last_hovered_section: DEFAULT_HOVERED_SECTION,
+            // child components
+            room_list: RoomList::new(state, action_tx.clone()),
+            message_input_box: MessageInputBox::new(state, action_tx),
+        }
+        .move_with_state(state)
+    }
+
     fn get_room_data(&self, name: &str) -> Option<&RoomData> {
         self.props.room_data_map.get(name)
     }
@@ -151,24 +169,6 @@ impl ChatPage {
 }
 
 impl Component for ChatPage {
-    fn new(state: &State, action_tx: UnboundedSender<Action>) -> Self
-    where
-        Self: Sized,
-    {
-        ChatPage {
-            action_tx: action_tx.clone(),
-            // set the props
-            props: Props::from(state),
-            // internal component state
-            active_section: Option::None,
-            last_hovered_section: DEFAULT_HOVERED_SECTION,
-            // child components
-            room_list: RoomList::new(state, action_tx.clone()),
-            message_input_box: MessageInputBox::new(state, action_tx),
-        }
-        .move_with_state(state)
-    }
-
     fn move_with_state(self, state: &State) -> Self
     where
         Self: Sized,

@@ -5,9 +5,8 @@ use ratatui::{
     widgets::{Block, Borders, Paragraph},
     Frame,
 };
-use tokio::sync::mpsc::UnboundedSender;
 
-use crate::state_store::{action::Action, State};
+use crate::state_store::State;
 
 use super::{Component, ComponentRender};
 
@@ -19,6 +18,14 @@ pub struct InputBox {
 }
 
 impl InputBox {
+    pub(crate) fn new() -> Self {
+        Self {
+            //
+            text: String::new(),
+            cursor_position: 0,
+        }
+    }
+
     pub fn text(&self) -> &str {
         &self.text
     }
@@ -81,14 +88,6 @@ impl InputBox {
 }
 
 impl Component for InputBox {
-    fn new(_state: &State, _action_tx: UnboundedSender<Action>) -> Self {
-        Self {
-            //
-            text: String::new(),
-            cursor_position: 0,
-        }
-    }
-
     fn move_with_state(self, _state: &State) -> Self
     where
         Self: Sized,

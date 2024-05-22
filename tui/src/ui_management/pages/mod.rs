@@ -39,6 +39,19 @@ pub struct AppRouter {
 }
 
 impl AppRouter {
+    pub(crate) fn new(state: &State, action_tx: UnboundedSender<Action>) -> Self
+    where
+        Self: Sized,
+    {
+        AppRouter {
+            props: Props::from(state),
+            //
+            chat_page: ChatPage::new(state, action_tx.clone()),
+            connect_page: ConnectPage::new(state, action_tx.clone()),
+        }
+        .move_with_state(state)
+    }
+
     fn get_active_page_component(&self) -> &dyn Component {
         match self.props.active_page {
             ActivePage::ChatPage => &self.chat_page,
@@ -55,19 +68,6 @@ impl AppRouter {
 }
 
 impl Component for AppRouter {
-    fn new(state: &State, action_tx: UnboundedSender<Action>) -> Self
-    where
-        Self: Sized,
-    {
-        AppRouter {
-            props: Props::from(state),
-            //
-            chat_page: ChatPage::new(state, action_tx.clone()),
-            connect_page: ConnectPage::new(state, action_tx.clone()),
-        }
-        .move_with_state(state)
-    }
-
     fn move_with_state(self, state: &State) -> Self
     where
         Self: Sized,

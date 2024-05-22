@@ -63,6 +63,15 @@ pub struct RoomList {
 }
 
 impl RoomList {
+    pub(crate) fn new(state: &State, action_tx: UnboundedSender<Action>) -> Self {
+        Self {
+            action_tx,
+            props: Props::from(state),
+            //
+            list_state: ListState::default(),
+        }
+    }
+
     fn next(&mut self) {
         let i = match self.list_state.selected() {
             Some(i) => {
@@ -112,15 +121,6 @@ impl RoomList {
 }
 
 impl Component for RoomList {
-    fn new(state: &State, action_tx: UnboundedSender<Action>) -> Self {
-        Self {
-            action_tx,
-            props: Props::from(state),
-            //
-            list_state: ListState::default(),
-        }
-    }
-
     fn move_with_state(self, state: &State) -> Self
     where
         Self: Sized,
