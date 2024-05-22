@@ -6,7 +6,7 @@ use ratatui::{
     Frame,
 };
 
-use crate::state_store::State;
+use crate::state_store::{action::Action, State};
 
 use super::{Component, ComponentRender};
 
@@ -95,26 +95,25 @@ impl Component for InputBox {
         "Input Box"
     }
 
-    fn handle_key_event(&mut self, key: KeyEvent) {
-        if key.kind != KeyEventKind::Press {
-            return;
+    fn handle_key_event(&mut self, key: KeyEvent) -> Option<Action> {
+        if key.kind == KeyEventKind::Press {
+            match key.code {
+                KeyCode::Char(to_insert) => {
+                    self.enter_char(to_insert);
+                }
+                KeyCode::Backspace => {
+                    self.delete_char();
+                }
+                KeyCode::Left => {
+                    self.move_cursor_left();
+                }
+                KeyCode::Right => {
+                    self.move_cursor_right();
+                }
+                _ => {}
+            }
         }
-
-        match key.code {
-            KeyCode::Char(to_insert) => {
-                self.enter_char(to_insert);
-            }
-            KeyCode::Backspace => {
-                self.delete_char();
-            }
-            KeyCode::Left => {
-                self.move_cursor_left();
-            }
-            KeyCode::Right => {
-                self.move_cursor_right();
-            }
-            _ => {}
-        }
+        None
     }
 }
 

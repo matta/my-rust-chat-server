@@ -4,7 +4,6 @@ use ratatui::{
     style::Color,
     Frame,
 };
-use tokio::sync::mpsc::UnboundedSender;
 
 use super::super::section::usage::{HasUsageInfo, UsageInfo, UsageInfoLine};
 use crate::ui_management::components::{
@@ -30,7 +29,6 @@ impl From<&State> for Props {
 }
 
 pub struct MessageInputBox {
-    action_tx: UnboundedSender<Action>,
     /// State Mapped MessageInputBox Props
     props: Props,
     // Internal State for the Component
@@ -38,25 +36,23 @@ pub struct MessageInputBox {
 }
 
 impl MessageInputBox {
-    pub(crate) fn new(state: &State, action_tx: UnboundedSender<Action>) -> Self {
+    pub(crate) fn new(state: &State) -> Self {
         Self {
-            action_tx: action_tx.clone(),
             props: Props::from(state),
             input_box: InputBox::new(),
         }
     }
 
-    fn submit_message(&mut self) {
-        if self.input_box.is_empty() {
-            return;
+    #[must_use]
+    fn submit_message(&mut self) -> Option<Action> {
+        let mut ret = None;
+        if !self.input_box.is_empty() {
+            ret = Some(Action::SendMessage {
+                content: String::from(self.input_box.text()),
+            });
+            self.input_box.reset();
         }
-
-        // TODO: handle the error scenario
-        let _ = self.action_tx.send(Action::SendMessage {
-            content: String::from(self.input_box.text()),
-        });
-
-        self.input_box.reset();
+        ret
     }
 }
 
@@ -69,18 +65,16 @@ impl Component for MessageInputBox {
         "Message Input"
     }
 
-    fn handle_key_event(&mut self, key: KeyEvent) {
-        if key.kind != KeyEventKind::Press {
-            return;
-        }
-
-        if self.props.active_room.is_some() {
-            self.input_box.handle_key_event(key);
+    fn handle_key_event(&mut self, key: KeyEvent) -> Option<Action> {
+        if key.kind == KeyEventKind::Press && self.props.active_room.is_some() {
+            let action = self.input_box.handle_key_event(key);
+            assert!(action.is_none());
 
             if key.code == KeyCode::Enter {
-                self.submit_message();
+                return self.submit_message();
             }
         }
+        None
     }
 }
 

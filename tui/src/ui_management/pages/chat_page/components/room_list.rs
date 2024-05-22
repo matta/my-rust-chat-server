@@ -6,7 +6,6 @@ use ratatui::{
     widgets::{Block, Borders, List, ListItem, ListState},
     Frame,
 };
-use tokio::sync::mpsc::UnboundedSender;
 
 use super::super::section::usage::{HasUsageInfo, UsageInfo, UsageInfoLine};
 use crate::{
@@ -53,8 +52,6 @@ impl From<&State> for Props {
 }
 
 pub struct RoomList {
-    /// Sending actions to the state store
-    action_tx: UnboundedSender<Action>,
     /// State Mapped RoomList Props
     props: Props,
     // Internal Component State
@@ -63,9 +60,8 @@ pub struct RoomList {
 }
 
 impl RoomList {
-    pub(crate) fn new(state: &State, action_tx: UnboundedSender<Action>) -> Self {
+    pub(crate) fn new(state: &State) -> Self {
         Self {
-            action_tx,
             props: Props::from(state),
             list_state: ListState::default(),
         }
@@ -128,30 +124,31 @@ impl Component for RoomList {
         "Room List"
     }
 
-    fn handle_key_event(&mut self, key: KeyEvent) {
+    fn handle_key_event(&mut self, key: KeyEvent) -> Option<Action>{
         if key.kind != KeyEventKind::Press {
-            return;
-        }
+            None
+        } else {
+            match key.code {
+                KeyCode::Up => {
+                    self.previous();
+                    None
+                }
+                KeyCode::Down => {
+                    self.next();
+                    None
+                }
+                KeyCode::Enter if self.list_state.selected().is_some() => {
+                    let selected_idx = self.list_state.selected().unwrap();
 
-        match key.code {
-            KeyCode::Up => {
-                self.previous();
-            }
-            KeyCode::Down => {
-                self.next();
-            }
-            KeyCode::Enter if self.list_state.selected().is_some() => {
-                let selected_idx = self.list_state.selected().unwrap();
+                    let rooms = self.rooms();
+                    let room_state = rooms.get(selected_idx).unwrap();
 
-                let rooms = self.rooms();
-                let room_state = rooms.get(selected_idx).unwrap();
-
-                // TODO: handle the error scenario somehow
-                let _ = self.action_tx.send(Action::SelectRoom {
-                    room: room_state.name.clone(),
-                });
+                    Some(Action::SelectRoom {
+                        room: room_state.name.clone(),
+                    })
+                }
+                _ => None,
             }
-            _ => (),
         }
     }
 }

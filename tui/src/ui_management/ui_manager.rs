@@ -46,7 +46,7 @@ impl UiManager {
         let mut app_router = {
             let state = state_rx.recv().await.unwrap();
 
-            AppRouter::new(&state, self.action_tx.clone())
+            AppRouter::new(&state)
         };
 
         let mut terminal = setup_terminal()?;
@@ -60,7 +60,9 @@ impl UiManager {
                 // Catch and handle crossterm events
                maybe_event = crossterm_events.next() => match maybe_event {
                     Some(Ok(Event::Key(key)))  => {
-                        app_router.handle_key_event(key);
+                        if let Some(action) = app_router.handle_key_event(key) {
+                            self.action_tx.send(action)?;
+                        }
                     },
                     None => break Ok(Interrupted::UserInt),
                     _ => (),

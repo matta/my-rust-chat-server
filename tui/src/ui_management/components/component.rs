@@ -1,7 +1,7 @@
 use crossterm::event::KeyEvent;
 use ratatui::{prelude::Backend, Frame};
 
-use crate::state_store::State;
+use crate::state_store::{action::Action, State};
 
 pub trait Component {
     fn update_from_state(&mut self, state: &State);
@@ -9,7 +9,8 @@ pub trait Component {
     // Returns a name used to describe the component in the UI.
     fn name(&self) -> &str;
 
-    fn handle_key_event(&mut self, key: KeyEvent);
+    #[must_use]
+    fn handle_key_event(&mut self, key: KeyEvent) -> Option<Action>;
 }
 
 pub trait ComponentRender<Props> {

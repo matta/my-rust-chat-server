@@ -1,6 +1,5 @@
 use crossterm::event::KeyEvent;
 use ratatui::{prelude::Backend, Frame};
-use tokio::sync::mpsc::UnboundedSender;
 
 use crate::state_store::{action::Action, ServerConnectionStatus, State};
 
@@ -39,14 +38,14 @@ pub struct AppRouter {
 }
 
 impl AppRouter {
-    pub(crate) fn new(state: &State, action_tx: UnboundedSender<Action>) -> Self
+    pub(crate) fn new(state: &State) -> Self
     where
         Self: Sized,
     {
         AppRouter {
             props: Props::from(state),
-            chat_page: ChatPage::new(state, action_tx.clone()),
-            connect_page: ConnectPage::new(state, action_tx.clone()),
+            chat_page: ChatPage::new(state),
+            connect_page: ConnectPage::new(state),
         }
     }
 
@@ -77,7 +76,7 @@ impl Component for AppRouter {
         self.get_active_page_component().name()
     }
 
-    fn handle_key_event(&mut self, key: KeyEvent) {
+    fn handle_key_event(&mut self, key: KeyEvent) -> Option<Action> {
         self.get_active_page_component_mut().handle_key_event(key)
     }
 }

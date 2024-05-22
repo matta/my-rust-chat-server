@@ -1,6 +1,5 @@
 use crossterm::event::{KeyCode, KeyEvent, KeyEventKind, KeyModifiers};
 use ratatui::{prelude::*, widgets::*, Frame};
-use tokio::sync::mpsc::UnboundedSender;
 
 use crate::state_store::ServerConnectionStatus;
 use crate::state_store::{action::Action, State};
@@ -28,8 +27,6 @@ impl From<&State> for Props {
 
 /// ConnectPage handles the connection to the server
 pub struct ConnectPage {
-    /// Action sender
-    pub action_tx: UnboundedSender<Action>,
     // Mapped Props from State
     props: Props,
     // Internal Components
@@ -37,7 +34,7 @@ pub struct ConnectPage {
 }
 
 impl ConnectPage {
-    pub(crate) fn new(state: &State, action_tx: UnboundedSender<Action>) -> Self
+    pub(crate) fn new(state: &State) -> Self
     where
         Self: Sized,
     {
@@ -45,20 +42,19 @@ impl ConnectPage {
         input_box.set_text(DEFAULT_SERVER_ADDR);
 
         ConnectPage {
-            action_tx: action_tx.clone(),
             props: Props::from(state),
             input_box,
         }
     }
 
-    fn connect_to_server(&mut self) {
+    fn connect_to_server(&mut self) -> Option<Action> {
         if self.input_box.is_empty() {
-            return;
+            return None;
         }
 
-        let _ = self.action_tx.send(Action::ConnectToServerRequest {
+        Some(Action::ConnectToServerRequest {
             addr: self.input_box.text().to_string(),
-        });
+        })
     }
 }
 
@@ -73,24 +69,21 @@ impl Component for ConnectPage {
         "Connect Page"
     }
 
-    fn handle_key_event(&mut self, key: KeyEvent) {
-        self.input_box.handle_key_event(key);
+    fn handle_key_event(&mut self, key: KeyEvent) -> Option<Action> {
+        let action = self.input_box.handle_key_event(key);
+        assert!(action.is_none());
 
         if key.kind != KeyEventKind::Press {
-            return;
+            return None;
         }
 
         match key.code {
-            KeyCode::Enter => {
-                self.connect_to_server();
-            }
-            KeyCode::Char('q') => {
-                let _ = self.action_tx.send(Action::Exit);
-            }
+            KeyCode::Enter => self.connect_to_server(),
+            KeyCode::Char('q') => Some(Action::Exit),
             KeyCode::Char('c') if key.modifiers.contains(KeyModifiers::CONTROL) => {
-                let _ = self.action_tx.send(Action::Exit);
+                Some(Action::Exit)
             }
-            _ => {}
+            _ => None
         }
     }
 }

@@ -2,7 +2,6 @@ use std::collections::HashMap;
 
 use crossterm::event::{KeyCode, KeyEvent, KeyEventKind, KeyModifiers};
 use ratatui::{prelude::*, widgets::*, Frame};
-use tokio::sync::mpsc::UnboundedSender;
 
 use crate::state_store::{action::Action, MessageBoxItem, RoomData, State};
 
@@ -73,8 +72,6 @@ const DEFAULT_HOVERED_SECTION: Section = Section::MessageInput;
 
 /// ChatPage handles the UI and the state of the chat page
 pub struct ChatPage {
-    /// Action sender
-    pub action_tx: UnboundedSender<Action>,
     /// State Mapped ChatPage Props
     props: Props,
     // Internal State
@@ -90,17 +87,16 @@ pub struct ChatPage {
 }
 
 impl ChatPage {
-    pub(crate) fn new(state: &State, action_tx: UnboundedSender<Action>) -> Self {
+    pub(crate) fn new(state: &State) -> Self {
         ChatPage {
-            action_tx: action_tx.clone(),
             // set the props
             props: Props::from(state),
             // internal component state
             active_section: Option::None,
             last_hovered_section: DEFAULT_HOVERED_SECTION,
             // child components
-            room_list: RoomList::new(state, action_tx.clone()),
-            message_input_box: MessageInputBox::new(state, action_tx),
+            room_list: RoomList::new(state),
+            message_input_box: MessageInputBox::new(state),
         }
     }
 
@@ -175,9 +171,9 @@ impl Component for ChatPage {
         "Chat Page"
     }
 
-    fn handle_key_event(&mut self, key: KeyEvent) {
+    fn handle_key_event(&mut self, key: KeyEvent) -> Option<Action> {
         if key.kind != KeyEventKind::Press {
-            return;
+            return None;
         }
 
         let active_section = self.active_section.clone();
@@ -190,19 +186,25 @@ impl Component for ChatPage {
                     self.active_section = Some(last_hovered_section.clone());
                     self.get_section_activation_for_section(&last_hovered_section)
                         .activate();
+                    None
                 }
-                KeyCode::Left => self.hover_previous(),
-                KeyCode::Right => self.hover_next(),
-                KeyCode::Char('q') => {
-                    let _ = self.action_tx.send(Action::Exit);
+                KeyCode::Left => {
+                    self.hover_previous();
+                    None
                 }
+                KeyCode::Right => {
+                    self.hover_next();
+                    None
+                }
+                KeyCode::Char('q') => Some(Action::Exit),
                 KeyCode::Char('c') if key.modifiers.contains(KeyModifiers::CONTROL) => {
-                    let _ = self.action_tx.send(Action::Exit);
+                    Some(Action::Exit)
                 }
-                _ => {}
+                _ => None,
             },
             Some(section) => {
-                self.get_component_for_section_mut(&section)
+                // FIXME: return the result of this function call!!!!
+                let action = self.get_component_for_section_mut(&section)
                     .handle_key_event(key);
 
                 // disable the section according to the action taken
@@ -210,11 +212,15 @@ impl Component for ChatPage {
                 // or when enter is pressed on the room list
                 match section {
                     Section::RoomList if key.code == KeyCode::Enter => {
-                        self.disable_section(&section)
+                        self.disable_section(&section);
                     }
-                    _ if key.code == KeyCode::Esc => self.disable_section(&section),
+                    _ if key.code == KeyCode::Esc => {
+                        self.disable_section(&section);
+                    }
                     _ => (),
                 }
+
+                action
             }
         }
     }
