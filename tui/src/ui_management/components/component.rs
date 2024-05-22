@@ -8,6 +8,7 @@ pub trait Component {
     where
         Self: Sized;
 
+    // Returns a name used to describe the component in the UI.
     fn name(&self) -> &str;
 
     fn handle_key_event(&mut self, key: KeyEvent);
