@@ -73,7 +73,7 @@ async fn spawn_single_user(rooms_to_join: Vec<String>) -> anyhow::Result<()> {
 
     match result.as_ref() {
         Ok(_) => println!("exited without problems"),
-        Err(err) => println!("some error occurred = {}", err.to_string()),
+        Err(err) => println!("some error occurred = {}", err),
     }
 
     result
@@ -113,7 +113,7 @@ async fn spawn_single_user_raw(rooms_to_join: Vec<String>) -> anyhow::Result<()>
                 let _ = command_writer
                     .write(&UserCommand::SendMessage(
                         comms::command::SendMessageCommand {
-                            room: String::from(room_name),
+                            room: room_name,
                             content: nanoid!(),
                         },
                     ))
@@ -124,7 +124,7 @@ async fn spawn_single_user_raw(rooms_to_join: Vec<String>) -> anyhow::Result<()>
         }
     });
 
-    while let Some(_) = event_stream.next().await {}
+    while event_stream.next().await.is_some() {}
 
     join_handle.abort();
     Ok(())
@@ -164,5 +164,5 @@ async fn main() {
         }
     }
 
-    while let Some(_) = join_set.join_next().await {}
+    while join_set.join_next().await.is_some() {}
 }

@@ -89,7 +89,7 @@ impl State {
     pub fn handle_server_event(&mut self, event: &event::Event) {
         match event {
             event::Event::LoginSuccessful(event) => {
-                self.user_id = event.user_id.clone();
+                self.user_id.clone_from(&event.user_id);
                 self.room_data_map = event
                     .rooms
                     .clone()

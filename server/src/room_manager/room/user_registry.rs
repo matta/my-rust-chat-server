@@ -27,7 +27,7 @@ impl UserRegistry {
         let sessions = self
             .user_id_to_sessions
             .entry(user_id.clone())
-            .or_insert_with(HashSet::new);
+            .or_default();
 
         sessions.insert(session_id);
 
