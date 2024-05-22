@@ -95,7 +95,7 @@ impl Component for InputBox {
         "Input Box"
     }
 
-    fn handle_key_event(&mut self, key: KeyEvent) -> Option<Action> {
+    fn handle_key_event(&mut self, key: KeyEvent) -> Action {
         if key.kind == KeyEventKind::Press {
             match key.code {
                 KeyCode::Char(to_insert) => {
@@ -113,7 +113,7 @@ impl Component for InputBox {
                 _ => {}
             }
         }
-        None
+        Action::None
     }
 }
 

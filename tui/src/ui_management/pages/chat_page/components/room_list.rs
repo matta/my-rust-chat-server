@@ -124,18 +124,18 @@ impl Component for RoomList {
         "Room List"
     }
 
-    fn handle_key_event(&mut self, key: KeyEvent) -> Option<Action>{
+    fn handle_key_event(&mut self, key: KeyEvent) -> Action {
         if key.kind != KeyEventKind::Press {
-            None
+            Action::None
         } else {
             match key.code {
                 KeyCode::Up => {
                     self.previous();
-                    None
+                    Action::None
                 }
                 KeyCode::Down => {
                     self.next();
-                    None
+                    Action::None
                 }
                 KeyCode::Enter if self.list_state.selected().is_some() => {
                     let selected_idx = self.list_state.selected().unwrap();
@@ -143,11 +143,11 @@ impl Component for RoomList {
                     let rooms = self.rooms();
                     let room_state = rooms.get(selected_idx).unwrap();
 
-                    Some(Action::SelectRoom {
+                    Action::SelectRoom {
                         room: room_state.name.clone(),
-                    })
+                    }
                 }
-                _ => None,
+                _ => Action::None,
             }
         }
     }

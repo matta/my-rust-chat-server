@@ -9,8 +9,7 @@ pub trait Component {
     // Returns a name used to describe the component in the UI.
     fn name(&self) -> &str;
 
-    #[must_use]
-    fn handle_key_event(&mut self, key: KeyEvent) -> Option<Action>;
+    fn handle_key_event(&mut self, key: KeyEvent) -> Action;
 }
 
 pub trait ComponentRender<Props> {

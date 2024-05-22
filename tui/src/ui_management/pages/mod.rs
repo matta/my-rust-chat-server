@@ -76,7 +76,7 @@ impl Component for AppRouter {
         self.get_active_page_component().name()
     }
 
-    fn handle_key_event(&mut self, key: KeyEvent) -> Option<Action> {
+    fn handle_key_event(&mut self, key: KeyEvent) -> Action {
         self.get_active_page_component_mut().handle_key_event(key)
     }
 }

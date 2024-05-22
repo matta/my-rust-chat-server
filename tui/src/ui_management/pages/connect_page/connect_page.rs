@@ -1,11 +1,13 @@
 use crossterm::event::{KeyCode, KeyEvent, KeyEventKind, KeyModifiers};
 use ratatui::{prelude::*, widgets::*, Frame};
 
-use crate::state_store::ServerConnectionStatus;
-use crate::state_store::{action::Action, State};
-
-use crate::ui_management::components::input_box;
-use crate::ui_management::components::{input_box::InputBox, Component, ComponentRender};
+use crate::{
+    state_store::{action::Action, ServerConnectionStatus, State},
+    ui_management::components::{
+        input_box::{self, InputBox},
+        Component, ComponentRender,
+    },
+};
 
 struct Props {
     error_message: Option<String>,
@@ -47,14 +49,14 @@ impl ConnectPage {
         }
     }
 
-    fn connect_to_server(&mut self) -> Option<Action> {
+    fn connect_to_server(&mut self) -> Action {
         if self.input_box.is_empty() {
-            return None;
+            return Action::None;
         }
 
-        Some(Action::ConnectToServerRequest {
+        Action::ConnectToServerRequest {
             addr: self.input_box.text().to_string(),
-        })
+        }
     }
 }
 
@@ -69,21 +71,19 @@ impl Component for ConnectPage {
         "Connect Page"
     }
 
-    fn handle_key_event(&mut self, key: KeyEvent) -> Option<Action> {
+    fn handle_key_event(&mut self, key: KeyEvent) -> Action {
         let action = self.input_box.handle_key_event(key);
-        assert!(action.is_none());
+        assert_eq!(action, Action::None);
 
         if key.kind != KeyEventKind::Press {
-            return None;
+            return Action::None;
         }
 
         match key.code {
             KeyCode::Enter => self.connect_to_server(),
-            KeyCode::Char('q') => Some(Action::Exit),
-            KeyCode::Char('c') if key.modifiers.contains(KeyModifiers::CONTROL) => {
-                Some(Action::Exit)
-            }
-            _ => None
+            KeyCode::Char('q') => Action::Exit,
+            KeyCode::Char('c') if key.modifiers.contains(KeyModifiers::CONTROL) => Action::Exit,
+            _ => Action::None,
         }
     }
 }

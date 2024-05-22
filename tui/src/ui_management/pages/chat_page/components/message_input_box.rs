@@ -43,13 +43,12 @@ impl MessageInputBox {
         }
     }
 
-    #[must_use]
-    fn submit_message(&mut self) -> Option<Action> {
-        let mut ret = None;
+    fn submit_message(&mut self) -> Action {
+        let mut ret = Action::None;
         if !self.input_box.is_empty() {
-            ret = Some(Action::SendMessage {
+            ret = Action::SendMessage {
                 content: String::from(self.input_box.text()),
-            });
+            };
             self.input_box.reset();
         }
         ret
@@ -65,16 +64,16 @@ impl Component for MessageInputBox {
         "Message Input"
     }
 
-    fn handle_key_event(&mut self, key: KeyEvent) -> Option<Action> {
+    fn handle_key_event(&mut self, key: KeyEvent) -> Action {
         if key.kind == KeyEventKind::Press && self.props.active_room.is_some() {
             let action = self.input_box.handle_key_event(key);
-            assert!(action.is_none());
+            assert_eq!(action, Action::None);
 
             if key.code == KeyCode::Enter {
                 return self.submit_message();
             }
         }
-        None
+        Action::None
     }
 }
 

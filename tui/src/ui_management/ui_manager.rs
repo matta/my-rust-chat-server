@@ -60,7 +60,8 @@ impl UiManager {
                 // Catch and handle crossterm events
                maybe_event = crossterm_events.next() => match maybe_event {
                     Some(Ok(Event::Key(key)))  => {
-                        if let Some(action) = app_router.handle_key_event(key) {
+                        let action = app_router.handle_key_event(key);
+                        if action != Action::None {
                             self.action_tx.send(action)?;
                         }
                     },

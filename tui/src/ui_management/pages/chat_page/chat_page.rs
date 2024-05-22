@@ -171,9 +171,9 @@ impl Component for ChatPage {
         "Chat Page"
     }
 
-    fn handle_key_event(&mut self, key: KeyEvent) -> Option<Action> {
+    fn handle_key_event(&mut self, key: KeyEvent) -> Action {
         if key.kind != KeyEventKind::Press {
-            return None;
+            return Action::None;
         }
 
         let active_section = self.active_section.clone();
@@ -186,25 +186,23 @@ impl Component for ChatPage {
                     self.active_section = Some(last_hovered_section.clone());
                     self.get_section_activation_for_section(&last_hovered_section)
                         .activate();
-                    None
+                    Action::None
                 }
                 KeyCode::Left => {
                     self.hover_previous();
-                    None
+                    Action::None
                 }
                 KeyCode::Right => {
                     self.hover_next();
-                    None
+                    Action::None
                 }
-                KeyCode::Char('q') => Some(Action::Exit),
-                KeyCode::Char('c') if key.modifiers.contains(KeyModifiers::CONTROL) => {
-                    Some(Action::Exit)
-                }
-                _ => None,
+                KeyCode::Char('q') => Action::Exit,
+                KeyCode::Char('c') if key.modifiers.contains(KeyModifiers::CONTROL) => Action::Exit,
+                _ => Action::None,
             },
             Some(section) => {
-                // FIXME: return the result of this function call!!!!
-                let action = self.get_component_for_section_mut(&section)
+                let action = self
+                    .get_component_for_section_mut(&section)
                     .handle_key_event(key);
 
                 // disable the section according to the action taken
